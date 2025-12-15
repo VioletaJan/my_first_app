@@ -53,14 +53,6 @@ EXPECTED_FEATURES = get_expected_feature_names(scaler)
 st.title("Energy Efficiency – Violeta's Model")
 st.write("Enter building parameters to predict **Heating Load** and **Cooling Load**.")
 
-# Optional debug (toggle)
-with st.expander("Debug info (optional)"):
-    st.write("App folder:", str(BASE_DIR))
-    st.write("Model file exists:", MODEL_PATH.exists())
-    st.write("Scaler file exists:", SCALER_PATH.exists())
-    st.write("Scaler expects n features:", getattr(scaler, "n_features_in_", "unknown"))
-    st.write("Scaler expected feature names:", EXPECTED_FEATURES)
-
 with st.form("inputs"):
     st.subheader("Input features")
 
@@ -127,3 +119,4 @@ if submitted:
             "Most common cause: the scaler was fit on different feature names or extra preprocessing (e.g., one-hot encoding). "
             "Check the 'Debug info' expander above to see what the scaler expects."
         )
+
