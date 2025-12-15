@@ -9,7 +9,7 @@ import tensorflow as tf
 def load_model_and_scaler():
     with open("scaler.pkl", "rb") as f:
         scaler = pickle.load(f)
-    model = tf.keras.models.load_model("nn_model.h5")
+    model = tf.keras.models.load_model("best_model.keras")
     return model, scaler
 
 model, scaler = load_model_and_scaler()
@@ -59,5 +59,6 @@ if submitted:
     st.subheader("Predicted loads")
     st.metric("Heating Load", f"{heating:.2f}")
     st.metric("Cooling Load", f"{cooling:.2f}")
+
 
 
