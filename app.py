@@ -3,20 +3,42 @@ import numpy as np
 import pandas as pd
 import pickle
 import tensorflow as tf
+from pathlib import Path
 
-# Load model + scaler
+# -----------------------------
+# Constants
+# -----------------------------
+FEATURES = [
+    "Relative_Compactness",
+    "Surface_Area",
+    "Wall_Area",
+    "Roof_Area",
+    "Overall_Height",
+    "Glazing_Area",
+    "Orientation",
+    "Glazing_Area_Distribution",
+]
+
+BASE_DIR = Path(__file__).resolve().parent
+SCALER_PATH = BASE_DIR / "scaler_2.pkl"
+MODEL_PATH = BASE_DIR / "best_model.keras"
+
+# -----------------------------
+# Load model + scaler (once)
+# -----------------------------
 @st.cache_resource
 def load_model_and_scaler():
-    with open("scaler.pkl", "rb") as f:
+    with open(SCALER_PATH, "rb") as f:
         scaler = pickle.load(f)
-    model = tf.keras.models.load_model("best_model.keras")
+    model = tf.keras.models.load_model(MODEL_PATH)
     return model, scaler
 
 model, scaler = load_model_and_scaler()
 
+# -----------------------------
 # UI
+# -----------------------------
 st.title("Energy Efficiency – Violeta's Model")
-
 st.write("Enter building parameters to predict **Heating Load** and **Cooling Load**.")
 
 with st.form("inputs"):
@@ -35,8 +57,10 @@ with st.form("inputs"):
 
     submitted = st.form_submit_button("Predict")
 
+# -----------------------------
+# Prediction
+# -----------------------------
 if submitted:
-    # same column order as training!
     input_df = pd.DataFrame(
         [[
             relative_compactness,
@@ -48,17 +72,14 @@ if submitted:
             orientation,
             glazing_area_distribution,
         ]],
-        columns=scaler.feature_names_in_
+        columns=FEATURES
     )
 
-    # scale and predict
     X_scaled = scaler.transform(input_df)
     preds = model.predict(X_scaled)
-    heating, cooling = preds[0, 0], preds[0, 1]
+
+    heating, cooling = float(preds[0, 0]), float(preds[0, 1])
 
     st.subheader("Predicted loads")
     st.metric("Heating Load", f"{heating:.2f}")
     st.metric("Cooling Load", f"{cooling:.2f}")
-
-
-
